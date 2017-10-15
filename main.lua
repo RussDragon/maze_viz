@@ -1,29 +1,20 @@
 -- Main controller of graphics and input
+-- TODO: Figure out what to do with draw configs.
 
 local grid_class = require'grid'
 
 local WINDOW_W, WINDOW_H = 800, 800
 local ROWS, COLUMNS = 80, 50
 
-local draw_conf = {
-	grid = {}
-}
+local draw_conf = {}
+local grid
 
-local function hex_to_rgb(str)
-
-end
-
-local function setup_grid_draw(conf)
-	local conf = conf or {}
-
-	draw_conf.grid.h_length = conf.h_length or WINDOW_H / ROWS or error('Horizontal length must be specified.')
-	draw_conf.grid.v_length = conf.v_length or WINDOW_W / COLUMNS or error('Vertical length must be specified.')
-
-	draw_conf.grid.thickness = conf.thickness or 1
-	
-	draw_conf.grid.color = conf.color or '#000000'
-	draw_conf.grid.highlight_color = conf.highlight_color or '#FF0000'
-	draw_conf.grid.back_color = conf.back_color or '#FFFFFF'
+function hex2rgb(hex)
+  hex = hex:gsub("#", "")
+  return tonumber(hex:sub(1,2), 16), 
+  			 tonumber(hex:sub(3,4), 16), 
+				 tonumber(hex:sub(5,6), 16),
+				 #hex > 7 and tonumber(hex:sub(7,8) or 255)
 end
 
 function love.load()
@@ -33,9 +24,7 @@ function love.load()
   title = tostring(window_w) .. " x " .. tostring(window_h)
   love.window.setTitle(title)
 
-  setup_grid_draw()
-
-  local grid = grid_class:new(ROWS, COLUMNS)
+  grid = grid_class:new(ROWS, COLUMNS)
 end
 
 function love.update(dt)
@@ -43,5 +32,5 @@ function love.update(dt)
 end
 
 function love.draw()
-	
+
 end

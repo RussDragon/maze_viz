@@ -1,0 +1,3 @@
+local maze = {}
+
+return maze
