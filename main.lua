@@ -2,29 +2,24 @@
 -- TODO: Figure out what to do with draw configs.
 
 local grid_class = require'grid'
+local grid_render = require'grid_renderer'
 
-local WINDOW_W, WINDOW_H = 800, 800
-local ROWS, COLUMNS = 80, 50
+local WINDOW_W, WINDOW_H = 500, 500
+local ROWS, COLUMNS = 3, 3
 
 local draw_conf = {}
 local grid
-
-function hex2rgb(hex)
-  hex = hex:gsub("#", "")
-  return tonumber(hex:sub(1,2), 16), 
-  			 tonumber(hex:sub(3,4), 16), 
-				 tonumber(hex:sub(5,6), 16),
-				 #hex > 7 and tonumber(hex:sub(7,8) or 255)
-end
 
 function love.load()
 	love.graphics.setBackgroundColor(255, 255, 255, 255)
 	love.window.setMode(WINDOW_W, WINDOW_H, windowed, false, 0)
 
-  title = tostring(window_w) .. " x " .. tostring(window_h)
+  title = tostring(WINDOW_W) .. " x " .. tostring(WINDOW_H)
   love.window.setTitle(title)
 
-  grid = grid_class:new(ROWS, COLUMNS)
+  grid = grid_class:new(ROWS, COLUMNS, true)
+  grid:setrb(1, 1, false)
+  rend = grid_render:new(grid, 0, 0, love.graphics.getDimensions())
 end
 
 function love.update(dt)
@@ -32,5 +27,5 @@ function love.update(dt)
 end
 
 function love.draw()
-
+	rend:draw()
 end
