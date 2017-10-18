@@ -1,3 +1,5 @@
+local error, setmetatable = error, setmetatable
+
 local grid = {}
 local aux = {}
 
@@ -21,14 +23,14 @@ function grid:new(rows, columns, walls_mode, has_additions)
 	obj.grid = {}
 	
 	-- RIGHT WALL IS ALWAYS FIRST, BOTTOM WALL IS ALWAYS SECOND.
-	for i = 0, obj.size * 2 - 1 do
+	for i = 1, obj.size * 2 do
 		obj.grid[i] = walls_mode
 	end
 
 	if has_additions then 
 		obj.additions = {}
 
-		for i = 0, obj.size - 1 do
+		for i = 1, obj.size do
 			obj.additions[i] = false
 		end
 	end
@@ -36,19 +38,17 @@ function grid:new(rows, columns, walls_mode, has_additions)
 	return setmetatable(obj, self)
 end
 
--- Maybe it is better to use grid:get(offset)?
+-- WIP IN PROGRESS. ITERATOR ISN'T FINISHED. CONDITIONS DOESN'T WORK. !!!!!!
 function grid:get(x, y, i)
-	if not (x*y <= self.size) then error('Coordinates must be in grid.') end
+	if not (x*y <= self.size-1 and x >= 0 and y >= 0) then error('Coordinates must be in grid.') end
 
-	return self.grid[(y * self.rows + x)*2 + i]
+	return self.grid[(y * self.rows + x)*2 + i + 1]
 end
 
 function grid:set(x, y, i, f)
-	print(#self.grid)
-	print('x: ', x, ' y: ', y, ' offset: ', y * self.rows + x + i)
-	if not (x*y <= self.size) then error('Coordinates must be in grid.') end
+	if not (x*y <= self.size-1 and x >= 0 and y >= 0) then error('Coordinates must be in grid.') end
 	
-	self.grid[(y * self.rows + x)*2 + i] = f
+	self.grid[(y * self.rows + x)*2 + i + 1] = f
 	return true
 end
 
@@ -81,6 +81,27 @@ function grid:setb(x, y, b)
 	self:set(x, y, 1, b)
 
 	return true
+end
+
+function grid:iter()
+	local i = -1
+
+	return function()
+		if not (i > self.size) then
+			i = i + 1
+
+			local y = math.floor(i/self.rows)
+			local x = i - y * self.rows
+
+			return x, y
+		end
+	end
+end
+
+function grid:rows_iter()
+end
+
+function grid:columns_iter()
 end
 
 return grid
