@@ -1,14 +1,18 @@
 -- Main controller of graphics and input
 -- TODO: Figure out what to do with draw configs.
 
-local grid_class = require'grid'
-local grid_render = require'grid_renderer'
+local make_grid = require 'grid'
+local make_renderer = require 'grid_renderer'
+
+local make_bintree = require 'binarytree'
 
 local WINDOW_W, WINDOW_H = 500, 500
-local ROWS, COLUMNS = 10, 10
+local ROWS, COLUMNS = 30, 30
 
 local draw_conf = {}
-local grid
+local grid, gen, rend
+
+math.randomseed( os.time() )
 
 function love.load()
 	love.graphics.setBackgroundColor(255, 255, 255, 255)
@@ -17,11 +21,16 @@ function love.load()
   title = tostring(WINDOW_W) .. " x " .. tostring(WINDOW_H)
   love.window.setTitle(title)
 
-  grid = grid_class:new(ROWS, COLUMNS, true)
-  grid:setr(0, 1, false)
-  grid:setrb(1, 1, false)
-  grid:setb(1, 0, false)
-  rend = grid_render:new(grid, 0, 0, 500, 500)
+  -- grid = grid_class:new(ROWS, COLUMNS, true)
+  -- grid:setr(0, 1, false)
+  -- grid:setrb(1, 1, false)
+  -- grid:setb(1, 0, false)
+  -- rend = grid_render:new(grid, {ox = 0, oy = 0, x = 250, y = 250})
+
+  gen = make_bintree(ROWS, COLUMNS)
+  gen:generate()
+
+  rend2 = make_renderer(gen:get_grid(), {ox = 0, oy = 0, x = 500, y = 500})
 
   -- grid2 = grid_class:new(ROWS, COLUMNS, true)
   -- grid2:setr(0, 1, false)
@@ -47,7 +56,8 @@ function love.update(dt)
 end
 
 function love.draw()
-	rend:draw()
+	-- rend:draw()
+  rend2:draw()
 	-- rend2:draw()
 	-- rend3:draw()
 	-- rend4:draw()
