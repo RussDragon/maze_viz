@@ -7,6 +7,8 @@ local DRAW_DEFAULTS = {
 	highlight_color = "#FF0000"
 }
 
+-------------------------------------------------------------------------------
+
 local vertfromwalls = function(pix_x, pix_y, w, h, r_wall, b_wall)
   local vert = {}
 
@@ -25,6 +27,8 @@ local hex2rgb = function(hex)
 				 #hex > 7 and tonumber(hex:sub(7,8) or 255)
 end
 
+-------------------------------------------------------------------------------
+
 local make_renderer
 do
   local setup_draw = function(self, draw_mask, thickness, wall_color, highlight_color, back_color)
@@ -38,14 +42,21 @@ do
   	self._draw_conf.thickness = thickness or self._draw_conf.thickness 
   	self._draw_conf.wall_color = wall_color or self._draw_conf.wall_color
   	self._draw_conf.back_color = back_color or self._draw_conf.back_color
-  	self._draw_conf.highlight_color = highlight_color or self._draw_conf.highlight_color
+  	self._draw_conf.highlight_color = highlight_color or self.draw_conf._highlight_color
   end
 
   local update = function(self, dt)
   end
 
   local draw = function(self)
-  	local w, h = self._draw_conf.x/self._draw_conf.columns, self._draw_conf.y/self._draw_conf.rows
+    -- Should be cached
+    if not self._draw_conf.cell_w or not self._draw_conf.cell_h then
+    	self._draw_conf.cell_w = (self._draw_conf.x - self._draw_conf.ox)/self._draw_conf.columns 
+      self._draw_conf.cell_h = (self._draw_conf.y - self._draw_conf.oy)/self._draw_conf.rows
+    end
+
+    local w, h = self._draw_conf.cell_w, self._draw_conf.cell_h
+
   	local ox, oy = self._draw_conf.ox, self._draw_conf.oy
 
   	for x, y in self._grid:iter() do
@@ -55,10 +66,15 @@ do
         love.graphics.setLineWidth(1)
         love.graphics.line(v)
   		end
+
+      if self._grid:is_highlighted(x, y) then
+        love.graphics.setColor(0, 255, 0)
+        love.graphics.rectangle("fill", ox+(w*x), oy+(h*y), w, h) 
+      end
   	end
 
-    love.graphics.line(ox, oy+1, self._draw_conf.max_x, oy+1) -- Borders on the top and left
-    love.graphics.line(ox+1, oy, ox+1, self._draw_conf.max_y)
+    love.graphics.line(ox, oy, self._draw_conf.x, oy) -- Borders on the top and left
+    love.graphics.line(ox, oy, ox, self._draw_conf.y)
   end
 
   make_renderer = function(grid_obj, draw_mask)
@@ -66,6 +82,7 @@ do
     local draw_mask = draw_mask or {}
 
     local wh, ww = love.window.getMode()
+
     return 
     {
       setup_draw = setup_draw;
@@ -78,18 +95,18 @@ do
       _grid = grid_obj;
       _draw_conf = 
       {
-        ox = draw_mask.ox or 0,
-        oy = draw_mask.oy or 0,
-        x = draw_mask.x or ww,
-        y = draw_mask.y or wh,
+        ox = draw_mask.ox or 0;
+        oy = draw_mask.oy or 0;
+        x = draw_mask.x or ww;
+        y = draw_mask.y or wh;
 
-        rows = grid_obj:get_height(),
-        columns = grid_obj:get_width(),
+        rows = grid_obj:get_height();
+        columns = grid_obj:get_width();
         
-        thickness = DRAW_DEFAULTS.thickness,
-        wall_color = DRAW_DEFAULTS.wall_color,
-        back_color = DRAW_DEFAULTS.back_color,
-        highlight_color = DRAW_DEFAULTS.highlight_color,
+        thickness = DRAW_DEFAULTS.thickness;
+        wall_color = DRAW_DEFAULTS.wall_color;
+        back_color = DRAW_DEFAULTS.back_color;
+        highlight_color = DRAW_DEFAULTS.highlight_color;
       };
     }
   end

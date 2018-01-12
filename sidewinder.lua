@@ -1,20 +1,23 @@
 local make_grid = require 'grid'
 local type, math_random = type, math.random
 
-local make_binarytree_gen
+local make_sidewinder_gen
 do
   local step = function(self)
     local x, y, grid = self._x, self._y, self._grid
 
     if y ~= 0 then
-      if math_random(0, 1) == 1 and x ~= self._w - 1 then
-        grid:setr(x, y, false)
-      else
-        grid:setb(x, y - 1, false)
+      if math.random(0, 1) == 0 and x ~= self._w - 1 then
+        self._grid:setr(x, y, false)
+      else 
+        self._grid:setb(math_random(self._curx, x), y - 1, false)
+
+        if x ~= self._w - 1 then self._curx = x + 1 else self._curx = 0 end
       end
-    else
-      if x ~= self._w - 1 then
-        grid:setr(x, y, false)
+
+    else 
+      if self._x ~= self._w - 1 then 
+        self._grid:setr(x, y, false)
       end
     end
   end
@@ -27,22 +30,13 @@ do
   end
 
   local iter = function(self)
-    local grid_iter = self._grid:iter()
-
-    return function()
-      self._x, self._y = grid_iter()
-
-      if self._x and self._y then
-        self:step()
-      end
-    end
   end
 
   local get_grid = function(self)
     return self._grid
   end
 
-  make_binarytree_gen = function(rows, columns)
+  make_sidewinder_gen = function(rows, columns)
     return 
     {
       step = step;
@@ -55,8 +49,9 @@ do
       _w = rows;
       _x = false;
       _y = false;
+      _curx = 0;
     }
   end
 end
 
-return make_binarytree_gen
+return make_sidewinder_gen

@@ -5,12 +5,13 @@ local make_grid = require 'grid'
 local make_renderer = require 'grid_renderer'
 
 local make_bintree = require 'binarytree'
+local make_sidewinder = require 'sidewinder'
+local make_backtracking = require 'backtracking'
 
-local WINDOW_W, WINDOW_H = 500, 500
-local ROWS, COLUMNS = 30, 30
+local WINDOW_W, WINDOW_H = 800, 800
+local ROWS, COLUMNS = 20, 20
 
 local draw_conf = {}
-local grid, gen, rend
 
 math.randomseed( os.time() )
 
@@ -21,44 +22,29 @@ function love.load()
   title = tostring(WINDOW_W) .. " x " .. tostring(WINDOW_H)
   love.window.setTitle(title)
 
-  -- grid = grid_class:new(ROWS, COLUMNS, true)
-  -- grid:setr(0, 1, false)
-  -- grid:setrb(1, 1, false)
-  -- grid:setb(1, 0, false)
-  -- rend = grid_render:new(grid, {ox = 0, oy = 0, x = 250, y = 250})
+  bintree_gen = make_bintree(ROWS, COLUMNS)
+  -- bintree_gen:generate()
 
-  gen = make_bintree(ROWS, COLUMNS)
-  gen:generate()
+  sidewinder_gen = make_sidewinder(ROWS, COLUMNS)
+  -- sidewinder_gen:generate()
 
-  rend2 = make_renderer(gen:get_grid(), {ox = 0, oy = 0, x = 500, y = 500})
+  backtracking_gen = make_backtracking(ROWS, COLUMNS)
+  -- backtracking_gen:generate()
 
-  -- grid2 = grid_class:new(ROWS, COLUMNS, true)
-  -- grid2:setr(0, 1, false)
-  -- grid2:setrb(1, 1, false)
-  -- grid2:setb(1, 0, false)
-  -- rend2 = grid_render:new(grid2, 250, 0, 250, 250)
-
-  -- grid3 = grid_class:new(ROWS, COLUMNS, true)
-  -- grid3:setr(0, 1, false)
-  -- grid3:setrb(1, 1, false)
-  -- grid3:setb(1, 0, false)
-  -- rend3 = grid_render:new(grid3, 0, 250, 250, 250)
-
-  -- grid4 = grid_class:new(ROWS, COLUMNS, true)
-  -- grid4:setr(0, 1, false)
-  -- grid4:setrb(1, 1, false)
-  -- grid4:setb(1, 0, false)
-  -- rend4 = grid_render:new(grid4, 250, 250, 250, 250)
+  rend = make_renderer(bintree_gen:get_grid(), {ox = 0, oy = 0, x = 800, y = 800})
+  rend2 = make_renderer(sidewinder_gen:get_grid(), {ox = 0, oy = 0, x = 800, y = 800})
+  rend3 = make_renderer(backtracking_gen:get_grid(), {ox = 0, oy = 0, x = 800, y = 800})
 end
 
 function love.update(dt)
+  if not gen_iter then 
+    gen_iter = backtracking_gen:iter()
+  end
 
+  gen_iter()
+  love.timer.sleep(0.1)
 end
 
 function love.draw()
-	-- rend:draw()
-  rend2:draw()
-	-- rend2:draw()
-	-- rend3:draw()
-	-- rend4:draw()
+	rend3:draw()
 end
