@@ -1,10 +1,11 @@
 local type, tonumber, error, setmetatable = type, tonumber, error, setmetatable
 
 local DRAW_DEFAULTS = {
-	thickness = 1,
-	wall_color = "#000000",
-	back_color = "#FFFFFF",
-	highlight_color = "#FF0000"
+	thickness = 1;
+	wall_color = "#000000";
+	back_color = "#FFFFFF";
+	highlight_color = "#FF0000";
+  cursor_color = "#00FF00"
 }
 
 -------------------------------------------------------------------------------
@@ -18,13 +19,13 @@ local vertfromwalls = function(pix_x, pix_y, w, h, r_wall, b_wall)
   return vert
 end
 
-local hex2rgb = function(hex)
+local hex_to_rgb = function(hex)
   hex = hex:gsub("#", "")
 
   return tonumber(hex:sub(1,2), 16),
   			 tonumber(hex:sub(3,4), 16), 
 				 tonumber(hex:sub(5,6), 16),
-				 #hex > 7 and tonumber(hex:sub(7,8) or 255)
+				 #hex > 7 and tonumber(hex:sub(7,8) or 255) or 255
 end
 
 -------------------------------------------------------------------------------
@@ -59,20 +60,25 @@ do
 
   	local ox, oy = self._draw_conf.ox, self._draw_conf.oy
 
-  	for x, y in self._grid:iter() do
-  		for _, v in pairs(vertfromwalls(ox+(w*x), oy+(h*y), w, h, self._grid:getrb(x, y))) do
-  			local r, g, b = 0, 0, 0
-        love.graphics.setColor(r, g, b)
+    for x, y in self._grid:iter() do
+      love.graphics.setColor(0, 0, 0)
+
+      for _, v in pairs(vertfromwalls(ox + (w * x), oy + (h * y), w, h, self._grid:getrb(x, y))) do
         love.graphics.setLineWidth(1)
         love.graphics.line(v)
   		end
 
-      if self._grid:is_highlighted(x, y) then
-        love.graphics.setColor(0, 255, 0)
-        love.graphics.rectangle("fill", ox+(w*x), oy+(h*y), w, h) 
+      if self._grid:is_cursor_set() then
+        local cursor = self._grid:get_cursor()
+        local posx, posy = (w * cursor.x), (h * cursor.y)
+
+        love.graphics.setColor(hex_to_rgb(self._draw_conf.cursor_color))
+        love.graphics.rectangle("fill", ox + posx + 1/8 * w, oy + posy + 1/8 * h, w * 6/8, h * 6/8)
+        -- love.graphics.rectangle('fill', ox + posx, oy + posy, w, h)
       end
   	end
 
+    love.graphics.setColor(0, 0, 0)
     love.graphics.line(ox, oy, self._draw_conf.x, oy) -- Borders on the top and left
     love.graphics.line(ox, oy, ox, self._draw_conf.y)
   end
@@ -107,6 +113,7 @@ do
         wall_color = DRAW_DEFAULTS.wall_color;
         back_color = DRAW_DEFAULTS.back_color;
         highlight_color = DRAW_DEFAULTS.highlight_color;
+        cursor_color = DRAW_DEFAULTS.cursor_color;
       };
     }
   end

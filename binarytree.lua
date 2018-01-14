@@ -33,6 +33,7 @@ do
       self._x, self._y = grid_iter()
 
       if self._x and self._y then
+        self._grid:set_cursor(self._x, self._y)
         self:step()
       end
     end

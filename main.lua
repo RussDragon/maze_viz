@@ -9,7 +9,7 @@ local make_sidewinder = require 'sidewinder'
 local make_backtracking = require 'backtracking'
 
 local WINDOW_W, WINDOW_H = 800, 800
-local ROWS, COLUMNS = 20, 20
+local ROWS, COLUMNS = 10, 10
 
 local draw_conf = {}
 
@@ -42,7 +42,7 @@ function love.update(dt)
   end
 
   gen_iter()
-  love.timer.sleep(0.1)
+  love.timer.sleep(0.5)
 end
 
 function love.draw()

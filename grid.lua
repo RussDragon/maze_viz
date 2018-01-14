@@ -8,13 +8,13 @@ do
 		return (y * self._rows + x) + 1
 	end
 
-	local get = function(self, x, y, i)
+	local getw = function(self, x, y, i)
 		if not (x * y <= self._size - 1 and x >= 0 and y >= 0) then error('Coordinates must be in grid.') end
 
 		return self._grid[calc_pos(self, x, y) * 2 + i]
 	end
 
-	local set = function(self, x, y, i, f)
+	local setw = function(self, x, y, i, f)
 		if not (x * y <= self._size-1 and x >= 0 and y >= 0) then error('Coordinates must be in grid.') end
 		
 		self._grid[calc_pos(self, x, y) * 2 + i] = f
@@ -22,32 +22,32 @@ do
 	end
 
 	local getrb = function(self, x, y)
-		return self:get(x, y, 0), self:get(x, y, 1)
+		return self:getw(x, y, 0), self:getw(x, y, 1)
 	end
 
 	local getr = function(self, x, y)
-		return self:get(x, y, 0)
+		return self:getw(x, y, 0)
 	end
 
 	local getb = function(self, x, y)
-		return self:get(x, y, 1)
+		return self:getw(x, y, 1)
 	end
 
 	local setrb = function(self, x, y, r, b)
-		self:set(x, y, 0, r)
-		self:set(x, y, 1, b)
+		self:setw(x, y, 0, r)
+		self:setw(x, y, 1, b)
 
 		return true
 	end
 
 	local setr = function(self, x, y, r)
-		self:set(x, y, 0, r)
+		self:setw(x, y, 0, r)
 
 		return true
 	end
 
 	local setb = function(self, x, y, b)
-		self:set(x, y, 1, b)
+		self:setw(x, y, 1, b)
 
 		return true
 	end
@@ -71,12 +71,36 @@ do
 		return self._columns
 	end
 
-	local is_highlighted = function(self, x, y)
-		return (self._highlighted.x == x and self._highlighted.y == y) or false
+	local add_highlight = function(self, x, y)
+		self._highlight[calc_pos(self, x, y)] = { x = x; y = y }
 	end
 
-	local set_highlight = function(self, x, y)
-		self._highlighted.x, self._highlighted.y = x, y
+	local remove_highlight = function(self, x, y)
+		self._highlight[calc_pos(self, x, y)] = nil
+	end
+
+	local get_highlight = function(self, x, y)
+		return self._highlight
+	end
+
+	local is_highlighted = function(self, x, y)
+		return self._highlight[calc_pos(self, x, y)]
+	end
+
+	local clear_highlight = function(self)
+		self._highlight = {}
+	end
+
+	local set_cursor = function(self, x, y)
+		self._cursor = { x = x; y = y }
+	end
+
+	local get_cursor = function(self, x, y)
+		return self._cursor
+	end
+
+	local is_cursor_set = function(self)
+		return self._cursor.x and self._cursor.y
 	end
 
 	-- Left to right, up to down
@@ -123,14 +147,14 @@ do
 
 		return 
 		{
-			get = get;
+			getw = getw;
 			getrb = getrb;
 			getr = getr;
 			getb = getb;
 			get_height = get_height;
 			get_width = get_width;
 
-			set = set;
+			setw = setw;
 			setrb = setrb;
 			setr = setr;
 			setb = setb;
@@ -138,8 +162,14 @@ do
 			set_attachment = set_attachment;
 			get_attachment = get_attachment;
 
+			add_highlight = add_highlight;
+			get_highlight = get_highlight;
+			clear_highlight = clear_highlight;
 			is_highlighted = is_highlighted;
-			set_highlight = set_highlight;
+
+			set_cursor = set_cursor;
+			get_cursor = get_cursor;
+			is_cursor_set = is_cursor_set;
 
 			iter = iter;
 
@@ -148,7 +178,8 @@ do
 			_size = size;
 			_attachments = attachments;
 			_grid = grid;
-			_highlighted = { x = false; y = false; };
+			_highlight = {  };
+			_cursor = { x = false; y = false }
 		}
 	end
 end
