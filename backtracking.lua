@@ -1,4 +1,4 @@
-local make_grid = require 'grid'
+local make_grid = require 'grid.grid'
 local type, math_random, table_insert, table_remove = 
       type, math.random, table.insert, table.remove
 
