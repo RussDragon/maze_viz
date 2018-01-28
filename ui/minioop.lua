@@ -1,3 +1,5 @@
+local setmetatable, getmetatable = setmetatable, getmetatable
+
 local mod = {}
 
 function mod.class(class)

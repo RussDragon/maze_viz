@@ -1,48 +1,36 @@
-local context = {}
-context.__index = context
+local oop = require 'minioop'
 
-function context:new()
+local context = oop.class()
+
+function context:new(surface)
   local obj = {}
-  obj._children = {}
+  obj._root = surface
 
-  return setmetatable(obj, self)
+  return oop.object(self, obj)
 end
 
 function context:add_child(child)
-  self._children[#self._children + 1]  = child
+  self._root:add_child(child)
 end
 
 function context:on_mousepressed(x, y, button)
-  for i = #self._children, 1, -1 do
-    if self._children[i]:on_mousepressed(x, y, button) then
-      return true
-    end
-  end
+  self._root:on_mousepressed(x, y, button)
 end
 
 function context:on_mousereleased(x, y, button)
-  for i = #self._children, 1, -1 do
-    if self._children[i]:on_mousereleased(x, y, button) then
-      return true
-    end
-  end
+  self._root:on_mousereleased(x, y, button)
 end
 
 function context:on_mousemoved(x, y, dx, dy)
-  for i = #self._children, 1, -1 do
-    if self._children[i]:on_mousemoved(x, y, dx, dy) then
-      return true
-    end
-  end
+  self._root:on_mousemoved(x, y, dx, dy)
 end
 
 function context:draw()
-  for i = 1, #self._children do
-    self._children[i]:draw()
-  end
-end
+  love.graphics.push()
 
-function context:update()
+  self._root:draw()
+  
+  love.graphics.pop()
 end
 
 return context
